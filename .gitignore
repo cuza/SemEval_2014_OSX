@@ -22,3 +22,6 @@ nbproject
 
 #Compiled resources
 out
+
+#Log files
+*.log
