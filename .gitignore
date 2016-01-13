@@ -1,4 +1,4 @@
-# archivos basura creados por mac y windows
+#Archivos basura creados por OS X y Windows
 *~
 *.o
 *.out
@@ -11,7 +11,7 @@ CVS
 ._*
 Thumbs.db
 
-# archivos creados por los IDEs Eclipse, Zend Studio, Netbeans, PHPStorm y TextMate2
+#Archivos creados por los IDE's Eclipse, Zend Studio, Netbeans, PHPStorm y TextMate2
 .buildpath
 .project
 .settings
