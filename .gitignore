@@ -21,9 +21,4 @@ nbproject
 *.iml
 
 #Compiled resources
-!out/.gitkeep
 out
-
-#Output
-!output/.gitkeep
-output
