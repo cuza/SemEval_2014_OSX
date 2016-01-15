@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Semeval-2014.iml" filepath="$PROJECT_DIR$/Semeval-2014.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Semeval.iml" filepath="$PROJECT_DIR$/Semeval.iml" />
     </modules>
   </component>
 </project>

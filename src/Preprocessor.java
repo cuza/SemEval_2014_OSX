@@ -1,8 +1,6 @@
-import com.sun.javafx.collections.transformation.SortedList;
-import sun.misc.Regexp;
+//import com.sun.javafx.collections.transformation.SortedList;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,118 +21,70 @@ public class Preprocessor {
 
     private String _tweet;
 
+    private ArrayList<String> loadDict(String source) {
+        ArrayList<String> dictsList = new ArrayList<String>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(source));
+            while (reader.ready())
+                dictsList.add(reader.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return dictsList;
+    }
+
+    private HashMap<String, Double> loadMapDict(String source) {
+        HashMap<String, Double> dictsMap = new HashMap<String, Double>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(source));
+            while (reader.ready()) {
+                String[] line = reader.readLine().split("\t");
+                if (!dictsMap.containsKey(line[0])) {
+                    dictsMap.put(line[0], Double.parseDouble(line[1]));
+                } else {
+                    dictsMap.put(line[0], (dictsMap.get(line[0]) + Double.parseDouble(line[1])) / 2.0);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return dictsMap;
+    }
+
     private static String _vulgarSlang = "dicts/vulgar slang.dic";
-    private static ArrayList<String> __vulgarSlang;
 
     private ArrayList<String> getVulgarSlang() {
-        if (__vulgarSlang == null) {
-            __vulgarSlang = new ArrayList<String>();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(_vulgarSlang));
-                while (reader.ready())
-                    __vulgarSlang.add(reader.readLine());
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return __vulgarSlang;
+        return loadDict(_vulgarSlang);
     }
 
     private static String _positiveEmoticDic = "dicts/positive emoticons.dic";
-    private static ArrayList<String> __positiveEmoticDic;
 
     private ArrayList<String> getPositiveEmoticDic() {
-        if (__positiveEmoticDic == null) {
-            __positiveEmoticDic = new ArrayList<String>();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(_positiveEmoticDic));
-                while (reader.ready())
-                    __positiveEmoticDic.add(reader.readLine());
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return __positiveEmoticDic;
+        return loadDict(_positiveEmoticDic);
     }
 
     private static String _negativeEmoticDic = "dicts/negative emoticons.dic";
-    private static ArrayList<String> __negativeEmoticDic;
 
     private ArrayList<String> getNegativeEmoticDic() {
-        if (__negativeEmoticDic == null) {
-            __negativeEmoticDic = new ArrayList<String>();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(_negativeEmoticDic));
-                while (reader.ready())
-                    __negativeEmoticDic.add(reader.readLine());
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return __negativeEmoticDic;
+        return loadDict(_negativeEmoticDic);
     }
 
     private static String _ngramasDic = "dicts/ngrams.dic";
-    private static HashMap<String, Double> __ngramasDic;
 
     private HashMap<String, Double> getNgramsDic() {
-        if (__ngramasDic == null) {
-            __ngramasDic = new HashMap<String, Double>();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(_ngramasDic));
-                while (reader.ready()) {
-                    String[] line = reader.readLine().split("\t");
-                    if (!__ngramasDic.containsKey(line[0])) {
-                        __ngramasDic.put(line[0], Double.parseDouble(line[1]));
-                    } else {
-                        __ngramasDic.put(line[0], (__ngramasDic.get(line[0]) + Double.parseDouble(line[1])) / 2.0);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return __ngramasDic;
+        return loadMapDict(_ngramasDic);
     }
 
     private static String _pairsDic = "dicts/pairs.dic";
-    private static HashMap<String, Double> __pairsDic;
 
     private HashMap<String, Double> getPairsDic() {
-        if (__pairsDic == null) {
-            __pairsDic = new HashMap<String, Double>();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(_pairsDic));
-                while (reader.ready()) {
-                    String[] line = reader.readLine().split("\t");
-                    if (!__pairsDic.containsKey(line[0])) {
-                        __pairsDic.put(line[0], Double.parseDouble(line[1]));
-                    } else {
-                        __pairsDic.put(line[0], (__pairsDic.get(line[0]) + Double.parseDouble(line[1])) / 2.0);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return __pairsDic;
+        return loadMapDict(_pairsDic);
     }
 
     private static String _hashtagDic = "dicts/hashtags.dic";
-    private static ArrayList<String> __hashtagDic;
 
     private ArrayList<String> getHashtagDic() {
-        if (__hashtagDic == null) {
-            __hashtagDic = new ArrayList<String>();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(_hashtagDic));
-                while (reader.ready())
-                    __hashtagDic.add(reader.readLine());
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-        return __hashtagDic;
+        return loadDict(_hashtagDic);
     }
 
     public String tweet;

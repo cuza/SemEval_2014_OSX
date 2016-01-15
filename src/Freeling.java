@@ -25,7 +25,7 @@ public class Freeling {
 
     public static ListSentence ParseLine(String line) {
         if (op == null) {
-            System.loadLibrary("freeling_javaAPI/freeling_javaAPI");
+            System.loadLibrary("freeling_javaAPI");
 
             Util.initLocale("default");
 
