@@ -18,6 +18,10 @@ Thumbs.db
 nbproject
 .idea
 .tm_properties
+*.iml
 
 #Freeling
 data
+
+#Compiled resources
+out
