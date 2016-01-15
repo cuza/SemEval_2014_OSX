@@ -20,8 +20,10 @@ nbproject
 .tm_properties
 *.iml
 
-#Freeling
-data
-
 #Compiled resources
+!out/.gitkeep
 out
+
+#Output
+!output/.gitkeep
+output
