@@ -8,7 +8,7 @@ import edu.upc.freeling.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Freeling {
-    private static final String DATA = "./data/";
+    private static final String DATA = "/opt/local/share/freeling/";
     private static final String LANG = "en";
     private static MacoOptions op;
     private static LangIdent lgid;
@@ -39,7 +39,7 @@ public class Freeling {
 
             op.setDataFiles(
                     "",
-                    DATA + LANG + "/locucions.dat",
+                        DATA + LANG + "/locucions.dat",
                     DATA + LANG + "/quantities.dat",
                     DATA + LANG + "/afixos.dat",
                     DATA + LANG + "/probabilitats.dat",

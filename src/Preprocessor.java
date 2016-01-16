@@ -1,5 +1,3 @@
-//import com.sun.javafx.collections.transformation.SortedList;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -189,7 +187,6 @@ public class Preprocessor {
                 remove.add(s.pop());
             }
         }
-//        SortedList<Integer> sRemove = new SortedList<Integer>(remove);
         for (Integer i = 0; i < _tweet.length(); i++) {
             if (!(remove.contains(i) || trouble[_tweet.charAt(i)])) {
                 result += _tweet.charAt(i);
