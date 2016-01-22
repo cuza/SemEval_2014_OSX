@@ -2,7 +2,7 @@ import edu.upc.freeling.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Andy
+ * User: dave
  * Date: 24/01/14
  * Time: 13:03
  * To change this template use File | Settings | File Templates.

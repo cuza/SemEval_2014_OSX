@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Andy
+ * User: dave
  * Date: 18/02/14
  * Time: 15:41
  * To change this template use File | Settings | File Templates.

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Andy
+ * User: dave
  * Date: 25/01/14
  * Time: 18:33
  * To change this template use File | Settings | File Templates.
@@ -137,7 +137,7 @@ public class Preprocessor {
         String emailPattern = "(mailto:)?([-_\\.\\w])+@[\\.\\w]+\\.[\\w]{2,4}";
         String urlPattern = "(https|http|ftp)://[^\\s]+";
         _tweet = _tweet.replaceAll(urlPattern, " ");
-        //Todo: Buscar Regex para el correo
+        _tweet = _tweet.replaceAll(emailPattern, " ");
     }
 
     private void HtmlParser() {
