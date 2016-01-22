@@ -213,7 +213,11 @@ public class Preprocessor {
         String[] line;
         for (String _line : getVulgarSlang()) {
             line = _line.split("\t");
-            _tweet = _tweet.replaceAll("[^\\w](?i:" + line[0] + ")[^\\w]", " " + line[1] + " ");
+            try {
+                _tweet = _tweet.replaceAll("[^\\w](?i:" + line[0] + ")[^\\w]", " " + line[1] + " ");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
