@@ -2,17 +2,17 @@ import Mesure.Mesure;
 import Mesure.SentiMesure;
 import SentiGraph.Graph;
 import edu.upc.freeling.*;
+import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
+import weka.classifiers.meta.FilteredClassifier;
+import weka.core.Debug;
 import weka.core.Instances;
+import weka.filters.unsupervised.attribute.Remove;
+import Utils.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.TreeSet;
-
-import weka.classifiers.Evaluation;
-import weka.filters.unsupervised.attribute.Remove;
-import weka.classifiers.meta.FilteredClassifier;
-import weka.core.Debug;
 
 public class Main {
 
@@ -48,134 +48,134 @@ public class Main {
         TreeSet<String> pwords = new TreeSet<String>();
         TreeSet<String> nwords = new TreeSet<String>();
 
-        for (String s : ReadLines("dicts/pos words.dic"))
+        for (String s : Utils.ReadLines("dicts/pos words.dic"))
             pwords.add(s);
-        for (String s : ReadLines("dicts/neg words.dic"))
+        for (String s : Utils.ReadLines("dicts/neg words.dic"))
             nwords.add(s);
 
-        String line,temp;
+        String line, temp;
         String[] tweet;
         int pp = 0;
-            while ((temp = cp.GetLine()) != null) {
-                tweet=temp.split("\t");
-                line = tweet[3];
-                if (line.equals("Not Available")) continue;
+        while ((temp = cp.GetLine()) != null) {
+            tweet = temp.split("\t");
+            line = tweet[3];
+            if (line.equals("Not Available")) continue;
 
-                Preprocessor pre = new Preprocessor(line, false);
-                System.out.println(pp++ + ":>>> " + pre.result);
-                ArrayList<String> lemmas = new ArrayList<String>();
-                ArrayList<String> values = new ArrayList<String>();
-                Graph graph = new Graph(0);
+            Preprocessor pre = new Preprocessor(line, false);
+            System.out.println(pp++ + ":>>> " + pre.result);
+            ArrayList<String> lemmas = new ArrayList<String>();
+            ArrayList<String> values = new ArrayList<String>();
+            Graph graph = new Graph(0);
 
-                ListSentence ls = Freeling.ParseLine(pre.result);
-                ListSentenceIterator sIt = new ListSentenceIterator(ls);
-                while (sIt.hasNext()) {
-                    Sentence s = sIt.next();
-                    TreeDepnode tree = s.getDepTree();
-                    lemmas.add(tree.getInfo().getWord().getLemma());
-                    values.add(tree.getInfo().getWord().getForm());
-                    graph.AddNode(tree.getInfo().getWord().getLemma());
+            ListSentence ls = Freeling.ParseLine(pre.result);
+            ListSentenceIterator sIt = new ListSentenceIterator(ls);
+            while (sIt.hasNext()) {
+                Sentence s = sIt.next();
+                TreeDepnode tree = s.getDepTree();
+                lemmas.add(tree.getInfo().getWord().getLemma());
+                values.add(tree.getInfo().getWord().getForm());
+                graph.AddNode(tree.getInfo().getWord().getLemma());
 
-                    ArrayList<TreeDepnode> stack = new ArrayList<TreeDepnode>();
-                    Integer index = 1;
-                    stack.add(tree);
-                    while (index > 0) {
-                        index--;
-                        tree = stack.get(index);
+                ArrayList<TreeDepnode> stack = new ArrayList<TreeDepnode>();
+                Integer index = 1;
+                stack.add(tree);
+                while (index > 0) {
+                    index--;
+                    tree = stack.get(index);
 
-                        for (int i = 0; i < tree.numChildren(); i++) {
-                            TreeDepnode child = tree.nthChildRef(i);
-                            Word w = child.getInfo().getWord();
-                            lemmas.add(w.getLemma());
-                            values.add(w.getForm());
-                            graph.AddNode(w.getLemma());
-                            graph.AddEdge(w.getLemma(), tree.getInfo().getWord().getLemma(), 1);
+                    for (int i = 0; i < tree.numChildren(); i++) {
+                        TreeDepnode child = tree.nthChildRef(i);
+                        Word w = child.getInfo().getWord();
+                        lemmas.add(w.getLemma());
+                        values.add(w.getForm());
+                        graph.AddNode(w.getLemma());
+                        graph.AddEdge(w.getLemma(), tree.getInfo().getWord().getLemma(), 1);
 
-                            if (stack.size() > index)
-                                stack.add(index, child);
-                            else
-                                stack.add(child);
-                            index++;
-                        }
+                        if (stack.size() > index)
+                            stack.add(index, child);
+                        else
+                            stack.add(child);
+                        index++;
                     }
                 }
-
-                Double pos = 0.0,
-                        neg = 0.0,
-                        obj = 0.0,
-                        excl = 0.0,
-                        interr = 0.0,
-                        happy_emot = 0.0,
-                        sad_emot = 0.0,
-                        pos_count = 0.0,
-                        neg_count = 0.0,
-
-                        pos_measured_count = 0.0,
-                        neg_measured_count = 0.0,
-                        obj_measured_count = 0.0,
-
-                        neu = 0.0,
-                        neu_real_count = 0.0,
-                        ngrams = 0.0,
-                        pairs = 0.0;
-                Integer
-                        positiveHashtags = 0,
-                        negativeHashtags = 0;
-
-                excl = line.split("!").length - 1.0;
-                interr = line.split("\\?").length - 1.0;
-                excl /= excl + interr;
-                interr /= excl + interr;
-                happy_emot += pre.positiveEmoticons;
-                sad_emot += pre.negativeEmoticons;
-                ngrams = pre.ngrams;
-                pairs = pre.pairs;
-                positiveHashtags = pre.positiveHashtags;
-                negativeHashtags = pre.negativeHashtags;
-
-                for (int i = 0; i < lemmas.size(); i++) {
-                    if (sm.Mesures.containsKey(lemmas.get(i))) {
-                        Mesure kk = sm.Mesures.get(lemmas.get(i));
-                        pos += kk.getPositive();
-                        neg += kk.getNegative();
-                        obj += kk.getObjectiveCalc();
-                        //cambios competición//
-                        pos_measured_count += kk.getPositive() > 0 ? 1 : 0;
-                        neg_measured_count += kk.getNegative() > 0 ? 1 : 0;
-                        obj_measured_count += kk.getObjectiveCalc() > 0 ? 1 : 0;
-                        //
-                        neu += kk.getNeutral();
-                        //
-                        neu_real_count += kk.getNeutral() > 0 ? 1 : 0;
-                    }
-                    if (pwords.contains(values.get(i)) || pwords.contains(lemmas.get(i)))
-                        pos_count += 1.0;
-                    if (nwords.contains(values.get(i)) || nwords.contains(lemmas.get(i)))
-                        neg_count += 1.0;
-                }
-                model.add("#\t"+tweet[0]+"\t"+tweet[1]+"\t"+tweet[2]+"\t"+tweet[3]+"\t"+pre.tweet);
-                model.add(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s"
-                        , pos.toString().replace(',', '.')
-                        , neg.toString().replace(',', '.')
-                        , obj.toString().replace(',', '.')
-                        , excl.toString().replace(',', '.')
-                        , interr.toString().replace(',', '.')
-                        , happy_emot.toString().replace(',', '.')
-                        , sad_emot.toString().replace(',', '.')
-                        , pos_count.toString().replace(',', '.')
-                        , neg_count.toString().replace(',', '.')
-                        , pos_measured_count.toString().replace(',', '.')
-                        , neg_measured_count.toString().replace(',', '.')
-                        , obj_measured_count.toString().replace(',', '.')
-                        , neu.toString().replace(',', '.')
-                        , neu_real_count.toString().replace(',', '.')
-                        , ngrams.toString().replace(',', '.')
-                        , pairs.toString().replace(',', '.')
-                        , positiveHashtags.toString().replace(',', '.')
-                        , negativeHashtags.toString().replace(',', '.')
-                        , "?"
-                ));
             }
+
+            Double pos = 0.0,
+                    neg = 0.0,
+                    obj = 0.0,
+                    excl = 0.0,
+                    interr = 0.0,
+                    happy_emot = 0.0,
+                    sad_emot = 0.0,
+                    pos_count = 0.0,
+                    neg_count = 0.0,
+
+                    pos_measured_count = 0.0,
+                    neg_measured_count = 0.0,
+                    obj_measured_count = 0.0,
+
+                    neu = 0.0,
+                    neu_real_count = 0.0,
+                    ngrams = 0.0,
+                    pairs = 0.0;
+            Integer
+                    positiveHashtags = 0,
+                    negativeHashtags = 0;
+
+            excl = line.split("!").length - 1.0;
+            interr = line.split("\\?").length - 1.0;
+            excl /= excl + interr;
+            interr /= excl + interr;
+            happy_emot += pre.positiveEmoticons;
+            sad_emot += pre.negativeEmoticons;
+            ngrams = pre.ngrams;
+            pairs = pre.pairs;
+            positiveHashtags = pre.positiveHashtags;
+            negativeHashtags = pre.negativeHashtags;
+
+            for (int i = 0; i < lemmas.size(); i++) {
+                if (sm.Mesures.containsKey(lemmas.get(i))) {
+                    Mesure kk = sm.Mesures.get(lemmas.get(i));
+                    pos += kk.getPositive();
+                    neg += kk.getNegative();
+                    obj += kk.getObjectiveCalc();
+                    //cambios competición//
+                    pos_measured_count += kk.getPositive() > 0 ? 1 : 0;
+                    neg_measured_count += kk.getNegative() > 0 ? 1 : 0;
+                    obj_measured_count += kk.getObjectiveCalc() > 0 ? 1 : 0;
+                    //
+                    neu += kk.getNeutral();
+                    //
+                    neu_real_count += kk.getNeutral() > 0 ? 1 : 0;
+                }
+                if (pwords.contains(values.get(i)) || pwords.contains(lemmas.get(i)))
+                    pos_count += 1.0;
+                if (nwords.contains(values.get(i)) || nwords.contains(lemmas.get(i)))
+                    neg_count += 1.0;
+            }
+            model.add("#\t" + tweet[0] + "\t" + tweet[1] + "\t" + tweet[2] + "\t" + tweet[3] + "\t" + pre.tweet);
+            model.add(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s"
+                    , pos.toString().replace(',', '.')
+                    , neg.toString().replace(',', '.')
+                    , obj.toString().replace(',', '.')
+                    , excl.toString().replace(',', '.')
+                    , interr.toString().replace(',', '.')
+                    , happy_emot.toString().replace(',', '.')
+                    , sad_emot.toString().replace(',', '.')
+                    , pos_count.toString().replace(',', '.')
+                    , neg_count.toString().replace(',', '.')
+                    , pos_measured_count.toString().replace(',', '.')
+                    , neg_measured_count.toString().replace(',', '.')
+                    , obj_measured_count.toString().replace(',', '.')
+                    , neu.toString().replace(',', '.')
+                    , neu_real_count.toString().replace(',', '.')
+                    , ngrams.toString().replace(',', '.')
+                    , pairs.toString().replace(',', '.')
+                    , positiveHashtags.toString().replace(',', '.')
+                    , negativeHashtags.toString().replace(',', '.')
+                    , "?"
+            ));
+        }
         return model;
     }
 
@@ -204,7 +204,7 @@ public class Main {
                 "\r\n";
         for (String line : model)
             buffer += line + "\r\n";
-        WriteText(path, buffer);
+        Utils.WriteText(path, buffer);
     }
 
     private static ArrayList<String> TrainModel(SentiMesure sm, String negPath, String neuPath, String posPath) throws IOException {
@@ -224,9 +224,9 @@ public class Main {
         TreeSet<String> pwords = new TreeSet<String>();
         TreeSet<String> nwords = new TreeSet<String>();
 
-        for (String s : ReadLines("dicts/pos words.dic"))
+        for (String s : Utils.ReadLines("dicts/pos words.dic"))
             pwords.add(s);
-        for (String s : ReadLines("dicts/neg words.dic"))
+        for (String s : Utils.ReadLines("dicts/neg words.dic"))
             nwords.add(s);
 
         String line;
@@ -327,7 +327,7 @@ public class Main {
                     if (nwords.contains(values.get(i)) || nwords.contains(lemmas.get(i)))
                         neg_count += 1.0;
                 }
-                model.add("#\t"+pre.tweet);
+                model.add("#\t" + pre.tweet);
                 model.add(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s"
                         , pos.toString().replace(',', '.')
                         , neg.toString().replace(',', '.')
@@ -360,7 +360,7 @@ public class Main {
             String line;
             int pp = 0;
             while ((line = cp.GetLine()) != null) {
-                Preprocessor pre = new Preprocessor(line,false);
+                Preprocessor pre = new Preprocessor(line, false);
                 System.out.println(pp++ + ":>>> " + pre.result);
                 ListSentence ls = Freeling.ParseLine(pre.result);
 
@@ -446,28 +446,4 @@ public class Main {
         return result;
     }
 
-    private static ArrayList<String> ReadLines(String name) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(name));
-            ArrayList<String> lines = new ArrayList<String>();
-            while (reader.ready())
-                lines.add(reader.readLine());
-            return lines;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return null;
-    }
-
-    private static void WriteText(String name, String buffer) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(name));
-            writer.write(buffer);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
 }

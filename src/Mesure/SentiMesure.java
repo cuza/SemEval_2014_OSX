@@ -1,9 +1,12 @@
 package Mesure;
 
-import SentiGraph.*;
+import SentiGraph.Graph;
+import SentiGraph.UKB;
+import Utils.Utils;
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,34 +37,9 @@ public class SentiMesure {
     }
 
     private void FromFile(String name) {
-        for (String line : ReadLines(name)) {
+        for (String line : Utils.ReadLines(name)) {
             Mesure mesure = new Mesure(line);
             Mesures.put(mesure.Lemma, mesure);
-        }
-    }
-
-    private ArrayList<String> ReadLines(String name) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(name));
-            ArrayList<String> lines = new ArrayList<String>();
-            while (reader.ready())
-                lines.add(reader.readLine());
-            return lines;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return null;
-    }
-
-    private void WriteText(String name, String buffer) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(name));
-            writer.write(buffer);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -69,7 +47,7 @@ public class SentiMesure {
         String buffer = "";
         for (Map.Entry<String, Mesure> mesure : Mesures.entrySet())
             buffer += (mesure.getValue()) + "\r\n";
-        WriteText(name, buffer);
+        Utils.WriteText(name, buffer);
     }
 
     private void LoadMesures() {
@@ -77,11 +55,11 @@ public class SentiMesure {
         TreeSet<String> nwords = new TreeSet<String>();
         TreeSet<String> allwords = new TreeSet<String>();
 
-        for (String s : ReadLines("dicts/pos words.dic")) {
+        for (String s : Utils.ReadLines("dicts/pos words.dic")) {
             pwords.add(s);
             allwords.add(s);
         }
-        for (String s : ReadLines("dicts/neg words.dic")) {
+        for (String s : Utils.ReadLines("dicts/neg words.dic")) {
             nwords.add(s);
             allwords.add(s);
         }
@@ -106,10 +84,10 @@ public class SentiMesure {
                 tmp.Lemma = lemma.getKey();
                 tmp.setNegative(values[Negative._lemmas.get(lemma.getKey())]);
                 Mesures.put(lemma.getKey(), tmp);
-            } else{
-                try{
+            } else {
+                try {
                     Mesures.get(lemma.getKey())._negative += values[lemma.getValue()];
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

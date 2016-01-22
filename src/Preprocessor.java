@@ -49,39 +49,33 @@ public class Preprocessor {
         return dictsMap;
     }
 
-    private static String _vulgarSlang = "dicts/vulgar slang.dic";
-
     private ArrayList<String> getVulgarSlang() {
+        String _vulgarSlang = "dicts/vulgar slang.dic";
         return loadDict(_vulgarSlang);
     }
 
-    private static String _positiveEmoticDic = "dicts/positive emoticons.dic";
-
     private ArrayList<String> getPositiveEmoticDic() {
+        String _positiveEmoticDic = "dicts/positive emoticons.dic";
         return loadDict(_positiveEmoticDic);
     }
 
-    private static String _negativeEmoticDic = "dicts/negative emoticons.dic";
-
     private ArrayList<String> getNegativeEmoticDic() {
+        String _negativeEmoticDic = "dicts/negative emoticons.dic";
         return loadDict(_negativeEmoticDic);
     }
 
-    private static String _ngramasDic = "dicts/ngrams.dic";
-
     private HashMap<String, Double> getNgramsDic() {
+        String _ngramasDic = "dicts/ngrams.dic";
         return loadMapDict(_ngramasDic);
     }
 
-    private static String _pairsDic = "dicts/pairs.dic";
-
     private HashMap<String, Double> getPairsDic() {
+        String _pairsDic = "dicts/pairs.dic";
         return loadMapDict(_pairsDic);
     }
 
-    private static String _hashtagDic = "dicts/hashtags.dic";
-
     private ArrayList<String> getHashtagDic() {
+        String _hashtagDic = "dicts/hashtags.dic";
         return loadDict(_hashtagDic);
     }
 
@@ -241,4 +235,3 @@ public class Preprocessor {
         }
     }
 }
-
