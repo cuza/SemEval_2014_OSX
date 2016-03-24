@@ -1,2 +1,2 @@
-# Automated survey analysis system
+# Semeval 2014 (OS X version)
 
